@@ -1,8 +1,10 @@
+require 'dotenv/tasks'
+require 'json'
+require 'httparty'
+
 require './config/configuration'
 require './lib/suscriber'
 require './lib/publisher'
-require 'json'
-require 'httparty'
 
 task :listen do
   Suscriber.new.start
