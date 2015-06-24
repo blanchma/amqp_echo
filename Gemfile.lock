@@ -1,0 +1,33 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    amq-protocol (1.9.2)
+    bunny (1.7.0)
+      amq-protocol (>= 1.9.2)
+    cuba (3.4.0)
+      rack
+    httparty (0.13.5)
+      json (~> 1.8)
+      multi_xml (>= 0.5.2)
+    json (1.8.3)
+    multi_xml (0.5.5)
+    puma (2.11.3)
+      rack (>= 1.1, < 2.0)
+    rack (1.6.4)
+    shotgun (0.9.1)
+      rack (>= 1.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  bunny
+  cuba
+  httparty
+  json
+  puma
+  rack
+  shotgun
+
+BUNDLED WITH
+   1.10.1
