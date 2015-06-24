@@ -1,5 +1,8 @@
 require 'bundler/setup'
 Bundler.require#(:default, PADRINO_ENV)
+require 'dotenv'
+Dotenv.load
+
 require './config/configuration'
 require './lib/registration'
 require './lib/suscriber'

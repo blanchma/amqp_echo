@@ -9,10 +9,10 @@ module Configuration
     end
 
     def amqp_config
-      {host: ENV["AMQP_VHOST"],
+      {host: ENV["AMQP_HOST"],
        username: ENV["AMQP_USERNAME"],
        password: ENV["AMQP_PASSWORD"],
-       vhost: "sadwrfzk"}
+       vhost: ENV["AMQP_VHOST"]}
     end
   end
 

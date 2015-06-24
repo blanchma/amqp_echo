@@ -2,6 +2,7 @@ source 'https://rubygems.org'
 
 gem 'bunny'
 gem 'cuba'
+gem 'dotenv'
 gem 'json'
 gem 'puma'
 gem 'rack'

@@ -1,4 +1,6 @@
-require 'dotenv/tasks'
+require 'dotenv'
+Dotenv.load
+
 require 'json'
 require 'httparty'
 
@@ -11,7 +13,7 @@ task :listen do
 end
 
 task :ping do
-  response = HTTParty.post "http://localhost:9292/registration"
+  response = HTTParty.post "#{ENV["HOST"]}/registration"
   puts "Response: #{response.body}"
   body = JSON.parse(response.body)
 
@@ -38,6 +40,7 @@ task :echo do
   queue.bind(exchange, routing_key: "bridge.*.in")
 
   begin
+    puts "[Echo] Waiting for messages..."
     queue.subscribe(block: true) do |delivery_info, properties, body|
       puts "[Echo] Message: #{body}"
 
