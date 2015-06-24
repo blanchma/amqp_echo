@@ -27,7 +27,7 @@ task :ping do
 
   channel = connection.create_channel
   exchange = channel.topic(topic)
-  exchange.publish("ping", routing_key: "#{queue}.out", persistent: true)
+  exchange.publish("ping", {routing_key: "#{queue}.out", persistent: true})
 end
 
 task :echo do
@@ -36,7 +36,7 @@ task :echo do
   channel = connection.create_channel
   exchange = channel.topic(Suscriber::DEFAULT_TOPIC)
 
-  queue = channel.queue("", {exclusive: true, durable: true})
+  queue = channel.queue("", {durable: true})
   queue.bind(exchange, routing_key: "bridge.*.in")
 
   begin

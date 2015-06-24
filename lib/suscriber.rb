@@ -14,10 +14,10 @@ class Suscriber
 
   def start
     puts "[Suscriber] Start to listen to #{@routing_key} on topic: #{DEFAULT_TOPIC}"
-    
+
     exchange    = @channel.topic(DEFAULT_TOPIC)
 
-    queue = @channel.queue("", {exclusive: true, durable: true})
+    queue = @channel.queue("", {durable: true})
 
     queue.bind(exchange, routing_key: @routing_key)
 
@@ -31,7 +31,7 @@ class Suscriber
         routing_key[/.out/]=".in"
 
         puts "[Suscriber]  Message echo to #{routing_key}"
-        exchange.publish(body, routing_key: routing_key, persistent: true)
+        exchange.publish(body, {routing_key: routing_key, persistent: true})
 
         puts "[Suscriber] Echo complete"
       end
