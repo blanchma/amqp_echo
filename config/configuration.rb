@@ -4,6 +4,14 @@ module Configuration
     def configuration
     end
 
+    def topics
+      {
+        echo: "avi-on.bridge.echo",
+        encrypted_echo: "avi-on.bridge.encrypt",
+        inter: "avi-on.bridge.inter"
+      }
+    end
+
     def amqp_url
       ENV["AMQP_URL"]
     end

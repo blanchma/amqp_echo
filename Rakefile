@@ -5,11 +5,12 @@ require 'json'
 require 'httparty'
 
 require './config/configuration'
-require './lib/suscriber'
-require './lib/publisher'
+Dir[File.dirname(__FILE__) + '/lib/*.rb'].each{|file| require file }
 
 task :listen do
-  Suscriber.new.start
+  Echo.new.start
+  EncryptedEcho.new.start
+  sleep
 end
 
 task :ping do
@@ -26,7 +27,7 @@ task :ping do
   connection.start
 
   channel = connection.create_channel
-  exchange = channel.topic(topic)
+  exchange = channel.topic(topic, durable: true)
   exchange.publish("ping", {routing_key: "#{queue}.out", persistent: true})
 end
 
@@ -34,7 +35,7 @@ task :echo do
   connection = Bunny.new(Configuration.amqp_url)
   connection.start
   channel = connection.create_channel
-  exchange = channel.topic(Suscriber::DEFAULT_TOPIC)
+  exchange = channel.topic(::Configuration.topics[:echo], durable: true)
 
   queue = channel.queue("", {durable: true})
   queue.bind(exchange, routing_key: "bridge.*.in")

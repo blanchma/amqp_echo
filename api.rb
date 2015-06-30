@@ -4,14 +4,16 @@ require 'dotenv'
 Dotenv.load
 
 require './config/configuration'
-require './lib/registration'
-require './lib/suscriber'
+Dir[File.dirname(__FILE__) + '/lib/*.rb'].each{|file| require file }
+
+Cuba.use RedisConnect
 
 Cuba.define do
+
   on post do
     on "registration" do
       res["Content-Type"]="application/json"
-      registration = Registration.new
+      registration = Registration.create
       res.write registration.to_json
     end
 
