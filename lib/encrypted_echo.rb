@@ -1,9 +1,10 @@
 require "./lib/subscriber"
 
-require 'base64'
 require 'digest'
+require 'fast_secure_compare/fast_secure_compare'
 
 class EncryptedEcho < Subscriber
+  self.name = Configuration.topics[:encrypted_echo]
   self.topic = Configuration.topics[:encrypted_echo]
   self.routing_key = "bridge.*.out"
 
@@ -11,20 +12,43 @@ class EncryptedEcho < Subscriber
     puts "[EncryptedEcho] Start to listen to #{@routing_key} on topic: #{@topic}"
 
     @queue.subscribe do |delivery_info, properties, body|
+      body = JSON.parse(body)
       puts "[EncryptedEcho] Message: #{body}"
 
-      routing_key = delivery_info.routing_key
-      puts "[EncryptedEcho]  Message coming from #{routing_key}"
+      queue_out = delivery_info.routing_key
+      puts "[EncryptedEcho]  Message coming from #{queue_out}"
 
-      routing_key[/.out/]=".in"
+      queue = queue_out[/bridge.\d+/]
+      queue_in = queue + ".in"
 
-      puts "[EncryptedEcho] Message echo to #{routing_key}"
-      signature = Digest::SHA256.hexdigest(body.message)
+      registration = $redis.get queue
 
-      if FastSecureCompare.compare(body.message, signature)
-        exchange.publish({message: body.message, signature: signature}, {routing_key: routing_key, persistent: true})
+      if registration
+        registration = JSON.parse(registration)
+
+        secret_key = registration["secret_key"]
+
+        puts "[EncryptedEcho] Secret key: #{secret_key}"
+
+        signature = Digest::SHA256.hexdigest("---#{body["message"]}---#{secret_key}---")
+
+        puts "[EncryptedEcho] Created signature: #{signature}"
+        puts "[EncryptedEcho] Received signature: #{body["signature"]}"
+
+        if FastSecureCompare.compare(signature, body["signature"])
+          puts "[EncryptedEcho] Encrypted message echo to #{routing_key}"
+          exchange.publish( {message: body["message"], signature: signature}.to_json,
+                            {routing_key: queue_in, persistent: true})
+
+        else
+          puts "[EncryptedEcho] Error 403"
+          exchange.publish( {error: {code: "403", message: "Signature not match"} }.to_json,
+                            {routing_key: queue_in, persistent: true})
+        end
       else
-        exchange.publish({error: {code: "403", message: "signature not match"} }, {routing_key: routing_key, persistent: true})
+        puts "[EncryptedEcho] Error 404"
+        exchange.publish( {error: {code: "404", message: "Registration not found"} }.to_json,
+                          {routing_key: queue_in, persistent: true})
       end
 
       puts "[EncryptedEcho] Echo complete"

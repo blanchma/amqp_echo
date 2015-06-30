@@ -4,16 +4,16 @@ class Registration
   def self.create
     registration = new
     puts "Store registration[#{registration.id}]: #{registration.attributes}"
-    $redis.set registration.id, registration.attributes
+    $redis.set registration.id, registration.attributes.to_json
     registration
   end
 
   def initialize(mac_address=nil)
-    @attributes = {registration: {
-                    url: Configuration.amqp_url,
+    @attributes = { url: Configuration.amqp_url,
                     topic: Configuration.topics[:echo],
+                    encrypted_topic: Configuration.topics[:encrypted_echo],
                     queue: self.id,
-                    secret_key: self.secret_key} }
+                    secret_key: self.secret_key}
   end
 
   def id
@@ -25,6 +25,6 @@ class Registration
   end
 
   def to_json
-    @attributes.to_json
+    {registration: @attributes}.to_json
   end
 end

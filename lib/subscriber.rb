@@ -3,7 +3,7 @@ require './config/configuration'
 class Subscriber
 
   class << self
-    attr_accessor :routing_key, :topic
+    attr_accessor :name, :routing_key, :topic
   end
 
   attr_reader :connection, :channel, :routing_key, :queue, :exchange
@@ -11,7 +11,9 @@ class Subscriber
   def initialize(topic=nil, routing_key=nil)
     @connection = Bunny.new(::Configuration.amqp_url)
     @connection.start
+    
     @topic = topic || self.class.topic
+    @name = self.class.name || @topic
     @routing_key = routing_key || self.class.routing_key
 
     create_channel
@@ -52,7 +54,7 @@ class Subscriber
   end
 
   def bind_queue
-    @queue = @channel.queue("", durable: true)
+    @queue = @channel.queue(@name, durable: true)
     @queue.bind(@exchange, routing_key: @routing_key)
   end
 end
