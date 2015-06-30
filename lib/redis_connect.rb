@@ -5,8 +5,9 @@ class RedisConnect
   end
 
   def call(env)
+    puts "Redis connect to #{ENV["REDISCLOUD_URL"]}"
     redis_url = URI.parse(ENV["REDISCLOUD_URL"])
-    $redis = Redis.new(uri: redis_url)
-    @app.call(env) 
+    $redis = Redis.new(url: redis_url)
+    @app.call(env)
   end
 end

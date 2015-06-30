@@ -4,7 +4,6 @@ Bundler.require
 require 'dotenv'
 Dotenv.load
 
-puts "REDIS: #{ENV["REDISCLOUD_URL"]}"
 require './config/configuration'
 Dir[File.dirname(__FILE__) + '/lib/*.rb'].each{|file| require file }
 

@@ -6,7 +6,7 @@ require './config/configuration'
 Dir[File.dirname(__FILE__) + '/lib/*.rb'].each{|file| require file }
 
 redis_url = URI.parse(ENV["REDISCLOUD_URL"])
-$redis = Redis.new(uri: redis_url)
+$redis = Redis.new(url: redis_url)
 
 task :listen do
   Echo.new.start
