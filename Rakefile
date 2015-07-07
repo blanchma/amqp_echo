@@ -36,7 +36,6 @@ task :ping do
     channel.close
     exit
   end
-
 end
 
 task :encrypted_ping do
@@ -65,25 +64,14 @@ task :encrypted_ping do
     routing_key = delivery_info.routing_key
     puts "[EncryptedEcho] Message coming from #{routing_key}"
 
-    queue = routing_key[/bridge.\d+/]
+    signature = Digest::SHA256.hexdigest("---#{body["message"]}---#{secret_key}---")
 
-    registration = $redis.get queue
-
-    if registration
-      registration = JSON.parse(registration)
-
-      secret_key = registration["secret_key"]
-
-      signature = Digest::SHA256.hexdigest("---#{body["message"]}---#{secret_key}---")
-
-      if FastSecureCompare.compare(body["signature"], signature)
-        puts "[EncryptedEcho] SUCCESS: Signature and message match"
-      else
-        puts "[EncryptedEcho] ERROR: Signature and message NOT match"
-      end
+    if FastSecureCompare.compare(body["signature"], signature)
+      puts "[EncryptedEcho] SUCCESS: Signature and message match"
     else
-      puts "[EncryptedEcho] ERROR: Registration not found"
+      puts "[EncryptedEcho] ERROR: Signature and message NOT match"
     end
+
     channel.close
     exit
   end

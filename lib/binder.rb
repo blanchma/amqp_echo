@@ -11,16 +11,15 @@ class Binder
   end
 
   def execute
-    exchange = @channel.topic(@topic, durable: true)
-
     #Bind Queue for inputs
-    queue = channel.queue(@queue_name, durable: true)
-    queue.bind(exchange, routing_key: "#{@queue_name}.in")
+    queue = @channel.queue(@queue_name, durable: true)
+    queue.bind(@topic, routing_key: "#{@queue_name}.in")
 
     #Bind Queue for outputs
-    queue = channel.queue("bridge.out", durable: true)
-    queue.bind(exchange, routing_key: "#{@queue_name}.out")
-    channel.close
+    queue = @channel.queue("bridge.out", durable: true)
+    queue.bind(@topic, routing_key: "#{@queue_name}.out")
+    
+    @channel.close
   end
 
 

@@ -22,8 +22,6 @@ class EncryptedEcho < Subscriber
       queue_out = delivery_info.routing_key
       puts "[EncryptedEcho]  Message coming from #{queue_out}"
 
-      queue_in = queue_out[/.out/]=".in"
-
       queue = queue_out[/bridge.\d+/]
       queue_in = queue + ".in"
 
@@ -42,7 +40,7 @@ class EncryptedEcho < Subscriber
         puts "[EncryptedEcho] Received signature: #{body["signature"]}"
 
         if FastSecureCompare.compare(signature, body["signature"])
-          puts "[EncryptedEcho] Encrypted message echo to #{routing_key}"
+          puts "[EncryptedEcho] Encrypted message echo to #{queue_in}"
           exchange.publish( {message: body["message"], signature: signature}.to_json,
                             {routing_key: queue_in, persistent: true})
 
