@@ -4,16 +4,14 @@ class Binder
   attr_reader :connection
 
   def initialize(topic, queue_name)
-    @connection = Bunny.new(::Configuration.amqp_url)
-    @connection.start
+    @channel = AmqpConnection.create_channel
 
     @topic = topic
     @queue_name = queue_name
   end
 
   def execute
-    channel = @connection.create_channel
-    exchange = channel.topic(@topic, durable: true)
+    exchange = @channel.topic(@topic, durable: true)
 
     #Bind Queue for inputs
     queue = channel.queue(@queue_name, durable: true)
@@ -22,6 +20,7 @@ class Binder
     #Bind Queue for outputs
     queue = channel.queue("bridge.out", durable: true)
     queue.bind(exchange, routing_key: "#{@queue_name}.out")
+    channel.close
   end
 
 

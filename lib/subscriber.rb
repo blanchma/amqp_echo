@@ -1,5 +1,7 @@
 require_relative '../config/configuration'
 
+#TODO: use a singleton connection to keep connections reduced to minimum
+
 class Subscriber
 
   class << self
@@ -9,14 +11,12 @@ class Subscriber
   attr_reader :connection, :channel, :exchange, :queue, :queue_name
 
   def initialize(topic=nil, queue_name=nil)
-    @connection = Bunny.new(::Configuration.amqp_url)
-    @connection.start
+    @channel = AmqpConnection.create_channel
 
     @topic = topic || self.class.topic
     @queue_name = self.class.queue_name || queue_name
 
-    create_channel
-    create_exchange
+    declare_exchange
     bind_queue
   end
 
@@ -44,11 +44,7 @@ class Subscriber
 
   private
 
-  def create_channel
-    @channel = @connection.create_channel
-  end
-
-  def create_exchange
+  def declare_exchange
     @exchange = @channel.topic(@topic, durable: true)
   end
 

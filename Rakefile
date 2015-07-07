@@ -23,11 +23,7 @@ task :ping do
   topic    = body["registration"]["topic"]
   queue    = body["registration"]["queue"]
 
-
-  connection = Bunny.new(amqp_url)
-  connection.start
-
-  channel = connection.create_channel
+  channel = AmqpConnection.create_channel
   exchange = channel.topic(topic, durable: true)
   exchange.publish("ping", {routing_key: "#{queue}.out", persistent: true})
 
@@ -39,8 +35,10 @@ task :ping do
     routing_key = delivery_info.routing_key
     puts "[Echo] Message coming from #{routing_key}"
 
+    connection.close
     exit
   end
+
 end
 
 
@@ -56,10 +54,8 @@ task :encrypted_ping do
 
   puts "[EncryptedPing] Secret key: #{secret_key}"
 
-  connection = Bunny.new(amqp_url)
-  connection.start
 
-  channel = connection.create_channel
+  channel = AmqpConnection.create_channel
   exchange = channel.topic(topic, durable: true)
   signature = Digest::SHA256.hexdigest("---ping---#{secret_key}---")
   exchange.publish({message: "ping", signature:  signature}.to_json,
