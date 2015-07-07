@@ -8,5 +8,10 @@ gem 'json'
 gem 'puma'
 gem 'rack'
 gem 'redis'
-gem 'shotgun'
-gem 'httparty'
+
+group :development do
+  gem 'httparty'
+  gem 'shotgun'
+  gem "cutest"
+  gem "rack-test"
+end

@@ -1,4 +1,5 @@
-require "./lib/subscriber"
+require_relative '../config/configuration'
+require_relative '../lib/subscriber'
 
 class Echo < Subscriber
   self.topic  = Configuration.topics[:echo]

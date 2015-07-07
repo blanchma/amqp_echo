@@ -1,5 +1,5 @@
 require 'bundler/setup'
-Bundler.require#(:default, PADRINO_ENV)
+Bundler.require(:default, :development)
 Dotenv.load
 
 require './config/configuration'
@@ -100,3 +100,9 @@ task :listen_encrypted_echo do
     exit
   end
 end
+
+task :test do
+  exec "cutest test/*.rb"
+end
+
+task :default => :test

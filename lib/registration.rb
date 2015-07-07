@@ -5,8 +5,8 @@ class Registration
     registration = new
     puts "Store registration[#{registration.id}]: #{registration.attributes}"
     $redis.set registration.id, registration.attributes.to_json
-    Binder.new(Configuration.topics[:echo], self.id)
-    Binder.new(Configuration.topics[:encrypted_echo], self.id)
+    Binder.new(Configuration.topics[:echo], registration.id)
+    Binder.new(Configuration.topics[:encrypted_echo], registration.id)
     registration
   end
 

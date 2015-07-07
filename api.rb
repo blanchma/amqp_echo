@@ -4,7 +4,7 @@ Bundler.require
 require 'dotenv'
 Dotenv.load
 
-require './config/configuration'
+require_relative 'config/configuration'
 Dir[File.dirname(__FILE__) + '/lib/*.rb'].each{|file| require file }
 
 Cuba.use RedisConnect

@@ -1,4 +1,4 @@
-require './config/configuration'
+require_relative '../config/configuration'
 
 class Subscriber
 
@@ -8,13 +8,12 @@ class Subscriber
 
   attr_reader :connection, :channel, :exchange, :queue, :queue_name
 
-  def initialize(topic=nil, queue=nil)
+  def initialize(topic=nil, queue_name=nil)
     @connection = Bunny.new(::Configuration.amqp_url)
     @connection.start
 
     @topic = topic || self.class.topic
-    @queue_name = self.class.queue || queue
-    @routing_key = routing_key || self.class.routing_key
+    @queue_name = self.class.queue_name || queue_name
 
     create_channel
     create_exchange

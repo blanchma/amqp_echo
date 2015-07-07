@@ -1,7 +1,5 @@
-#PASAR SIGNATURE POR HEADER
-
-
-require "./lib/subscriber"
+require_relative '../config/configuration'
+require_relative '../lib/subscriber'
 
 require 'digest'
 require 'fast_secure_compare/fast_secure_compare'

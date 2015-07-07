@@ -4,8 +4,11 @@ GEM
     amq-protocol (1.9.2)
     bunny (1.7.0)
       amq-protocol (>= 1.9.2)
+    clap (1.0.0)
     cuba (3.4.0)
       rack
+    cutest (1.2.2)
+      clap
     dotenv (2.0.2)
     fast_secure_compare (1.0.1)
     httparty (0.13.5)
@@ -16,6 +19,8 @@ GEM
     puma (2.11.3)
       rack (>= 1.1, < 2.0)
     rack (1.6.4)
+    rack-test (0.6.3)
+      rack (>= 1.0)
     redis (3.2.1)
     shotgun (0.9.1)
       rack (>= 1.0)
@@ -26,12 +31,14 @@ PLATFORMS
 DEPENDENCIES
   bunny
   cuba
+  cutest
   dotenv
   fast_secure_compare
   httparty
   json
   puma
   rack
+  rack-test
   redis
   shotgun
 

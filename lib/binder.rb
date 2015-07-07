@@ -1,4 +1,4 @@
-#TODO: this should be also an unbind command for de-registration
+require_relative '../config/configuration'
 
 class Binder
   attr_reader :connection
@@ -9,7 +9,6 @@ class Binder
 
     @topic = topic
     @queue_name = queue_name
-    @routing_key = routing_key
   end
 
   def execute
