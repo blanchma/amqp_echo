@@ -1,15 +1,21 @@
+#PASAR SIGNATURE POR HEADER
+
+
 require "./lib/subscriber"
 
 require 'digest'
 require 'fast_secure_compare/fast_secure_compare'
 
 class EncryptedEcho < Subscriber
-  self.name = Configuration.topics[:encrypted_echo]
   self.topic = Configuration.topics[:encrypted_echo]
-  self.routing_key = "bridge.*.out"
+  self.queue_name = "bridge.out"
+
+  def initialize
+    super(self.class.topic, self.class.queue_name)
+  end
 
   def start
-    puts "[EncryptedEcho] Start to listen to #{@routing_key} on topic: #{@topic}"
+    puts "[EncryptedEcho] Start to listen to #{@queue_name} on topic: #{@topic}"
 
     @queue.subscribe do |delivery_info, properties, body|
       body = JSON.parse(body)

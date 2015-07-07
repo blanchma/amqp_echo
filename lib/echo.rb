@@ -1,12 +1,15 @@
 require "./lib/subscriber"
 
 class Echo < Subscriber
-  self.name  = Configuration.topics[:echo]
-  self.topic = Configuration.topics[:echo]
-  self.routing_key = "bridge.*.out"
+  self.topic  = Configuration.topics[:echo]
+  self.queue_name = "bridge.out"
+
+  def initialize
+    super(self.class.topic, self.class.queue_name)
+  end
 
   def start
-    puts "[Echo] Start to listen to #{@routing_key} on topic: #{@topic}"
+    puts "[Echo] Start to listen to #{@quene_name} on topic: #{@topic}"
 
     @queue.subscribe(auto_delete: true) do |delivery_info, properties, body|
       puts "[Echo] Message: #{body}"

@@ -30,7 +30,19 @@ task :ping do
   channel = connection.create_channel
   exchange = channel.topic(topic, durable: true)
   exchange.publish("ping", {routing_key: "#{queue}.out", persistent: true})
+
+  listen_echo = Subscriber.new(topic, queue)
+
+  listen_echo.start(block: true) do |delivery_info, properties, body|
+    puts "[Echo] Message: #{body}"
+
+    routing_key = delivery_info.routing_key
+    puts "[Echo] Message coming from #{routing_key}"
+
+    exit
+  end
 end
+
 
 task :encrypted_ping do
   response = HTTParty.post "#{ENV["HOST"]}/registration"
@@ -54,21 +66,6 @@ task :encrypted_ping do
                    {routing_key: "#{queue}.out", persistent: true})
 end
 
-
-task :listen_echo do
-  listen_echo = Subscriber.new(::Configuration.topics[:echo], "bridge.*.in")
-  listen_echo.start(block: true) do |delivery_info, properties, body|
-    puts properties
-    puts "########################"
-    puts delivery_info
-    puts "[Echo] Message: #{body}"
-
-    routing_key = delivery_info.routing_key
-    puts "[Echo] Message coming from #{routing_key}"
-
-    exit
-  end
-end
 
 task :listen_encrypted_echo do
   listen_echo = Subscriber.new(::Configuration.topics[:encrypted_echo], "bridge.*.in")

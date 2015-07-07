@@ -3,17 +3,17 @@ require './config/configuration'
 class Subscriber
 
   class << self
-    attr_accessor :name, :routing_key, :topic
+    attr_accessor :topic, :queue_name
   end
 
-  attr_reader :connection, :channel, :routing_key, :queue, :exchange
+  attr_reader :connection, :channel, :exchange, :queue, :queue_name
 
-  def initialize(topic=nil, routing_key=nil)
+  def initialize(topic=nil, queue=nil)
     @connection = Bunny.new(::Configuration.amqp_url)
     @connection.start
-    
+
     @topic = topic || self.class.topic
-    @name = self.class.name || @topic
+    @queue_name = self.class.queue || queue
     @routing_key = routing_key || self.class.routing_key
 
     create_channel
@@ -22,7 +22,7 @@ class Subscriber
   end
 
   def start(options={}, &block)
-    puts "[Suscriber] Start to listen to #{@routing_key} on topic: #{@topic}"
+    puts "[Suscriber] Start to listen to #{@queue_name} on topic: #{@topic}"
 
     begin
       if block_given?
@@ -54,7 +54,6 @@ class Subscriber
   end
 
   def bind_queue
-    @queue = @channel.queue(@name, durable: true)
-    @queue.bind(@exchange, routing_key: @routing_key)
+    @queue = @channel.queue(@queue_name, durable: true)
   end
 end
