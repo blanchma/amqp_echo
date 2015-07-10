@@ -16,7 +16,6 @@ class EncryptedEcho < Subscriber
     puts "[EncryptedEcho] Start to listen to #{@queue_name} on topic: #{@topic}"
 
     @queue.subscribe(auto_delete: true) do |delivery_info, properties, body|
-      body = JSON.parse(body)
       puts "[EncryptedEcho] Message: #{body}"
 
       queue_out = delivery_info.routing_key
@@ -29,30 +28,44 @@ class EncryptedEcho < Subscriber
 
       if registration
         registration = JSON.parse(registration)
-
         secret_key = registration["secret_key"]
 
         puts "[EncryptedEcho] Secret key: #{secret_key}"
 
-        signature = Digest::SHA256.hexdigest("---#{body["message"]}---#{secret_key}---")
+        received_signature = properties.headers["avi-on-sign"]
+        signature = Digest::SHA256.hexdigest("---#{body}---#{secret_key}---")
 
         puts "[EncryptedEcho] Created signature: #{signature}"
-        puts "[EncryptedEcho] Received signature: #{body["signature"]}"
+        puts "[EncryptedEcho] Received signature: #{received_signature}"
 
-        if FastSecureCompare.compare(signature, body["signature"])
+        if FastSecureCompare.compare(signature, received_signature)
           puts "[EncryptedEcho] Encrypted message echo to #{queue_in}"
-          exchange.publish( {message: body["message"], signature: signature}.to_json,
-                            {routing_key: queue_in, persistent: true})
-
+          exchange.publish( body,
+                            { routing_key: queue_in,
+                              headers: {
+                                "avi-on-sign" => signature,
+                                "code" => "200"
+                              },
+                              persistent: true})
         else
           puts "[EncryptedEcho] Error 403"
-          exchange.publish( {error: {code: "403", message: "Signature not match"} }.to_json,
-                            {routing_key: queue_in, persistent: true})
+          exchange.publish( "Signature not match",
+                            { routing_key: queue_in,
+                              headers: {
+                                "avi-on-sign" => signature,
+                                "code" => "403"
+                              },
+                              persistent: true})
         end
       else
         puts "[EncryptedEcho] Error 404"
-        exchange.publish( {error: {code: "404", message: "Registration not found"} }.to_json,
-                          {routing_key: queue_in, persistent: true})
+        exchange.publish( "Registration not found",
+                          { routing_key: queue_in,
+                            headers: {
+                              "avi-on-sign" => signature,
+                              "code" => "404"
+                            },
+                            persistent: true})
       end
 
       puts "[EncryptedEcho] Echo complete"

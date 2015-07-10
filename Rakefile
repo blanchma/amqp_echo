@@ -9,7 +9,7 @@ redis_url = URI.parse(ENV["REDISCLOUD_URL"])
 $redis = Redis.new(url: redis_url)
 
 task :listen do
-  Echo.new.start
+  #Echo.new.start
   EncryptedEcho.new.start
   sleep
 end
@@ -52,21 +52,23 @@ task :encrypted_ping do
   exchange = channel.topic(topic, durable: true)
 
   signature = Digest::SHA256.hexdigest("---ping---#{secret_key}---")
-  exchange.publish({message: "ping", signature:  signature}.to_json,
-                   {routing_key: "#{queue}.out", persistent: true})
+  exchange.publish("ping",  headers: {"avi-on-sign" =>  signature},
+                            routing_key: "#{queue}.out",
+                            persistent: true)
 
   listen_echo = Subscriber.new(topic, queue)
 
   listen_echo.start(block: true) do |delivery_info, properties, body|
-    body = JSON.parse(body)
     puts "[EncryptedEcho] Message: #{body}"
 
     routing_key = delivery_info.routing_key
     puts "[EncryptedEcho] Message coming from #{routing_key}"
 
-    signature = Digest::SHA256.hexdigest("---#{body["message"]}---#{secret_key}---")
+    signature = Digest::SHA256.hexdigest("---#{body}---#{secret_key}---")
 
-    if FastSecureCompare.compare(body["signature"], signature)
+    puts "HEADERS: #{properties.headers}"
+
+    if FastSecureCompare.compare(properties.headers["avi-on-sign"], signature)
       puts "[EncryptedEcho] SUCCESS: Signature and message match"
     else
       puts "[EncryptedEcho] ERROR: Signature and message NOT match"
