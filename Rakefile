@@ -30,41 +30,34 @@ task :ping do
   listen_echo = Subscriber.new(topic, queue)
 
   listen_echo.start(block: true) do |delivery_info, properties, body|
-    puts "[Echo] Message: #{body}"
-
     routing_key = delivery_info.routing_key
-    puts "[Echo] Message coming from #{routing_key}"
+    puts "[Echo] Message \"#{body}\" coming from #{routing_key}"
 
-    connection.close
+    channel.close
     exit
   end
 
 end
 
-
 task :encrypted_ping do
   response = HTTParty.post "#{ENV["HOST"]}/registration"
-  puts "[EncryptedPing]  Response: #{response.body}"
+  puts "Response: #{response.body}"
   body = JSON.parse(response.body)
 
-  amqp_url      = body["registration"]["url"]
-  topic         = body["registration"]["encrypted_topic"]
-  queue         = body["registration"]["queue"]
-  secret_key    = body["registration"]["secret_key"]
-
-  puts "[EncryptedPing] Secret key: #{secret_key}"
-
+  amqp_url    = body["registration"]["url"]
+  topic       = body["registration"]["encrypted_topic"]
+  queue       = body["registration"]["queue"]
+  secret_key  = body["registration"]["secret_key"]
 
   channel = AmqpConnection.create_channel
   exchange = channel.topic(topic, durable: true)
+
   signature = Digest::SHA256.hexdigest("---ping---#{secret_key}---")
   exchange.publish({message: "ping", signature:  signature}.to_json,
                    {routing_key: "#{queue}.out", persistent: true})
-end
 
+  listen_echo = Subscriber.new(topic, queue)
 
-task :listen_encrypted_echo do
-  listen_echo = Subscriber.new(::Configuration.topics[:encrypted_echo], "bridge.*.in")
   listen_echo.start(block: true) do |delivery_info, properties, body|
     body = JSON.parse(body)
     puts "[EncryptedEcho] Message: #{body}"
@@ -91,8 +84,7 @@ task :listen_encrypted_echo do
     else
       puts "[EncryptedEcho] ERROR: Registration not found"
     end
-
-
+    channel.close
     exit
   end
 end

@@ -15,12 +15,14 @@ class EncryptedEcho < Subscriber
   def start
     puts "[EncryptedEcho] Start to listen to #{@queue_name} on topic: #{@topic}"
 
-    @queue.subscribe do |delivery_info, properties, body|
+    @queue.subscribe(auto_delete: true) do |delivery_info, properties, body|
       body = JSON.parse(body)
       puts "[EncryptedEcho] Message: #{body}"
 
       queue_out = delivery_info.routing_key
       puts "[EncryptedEcho]  Message coming from #{queue_out}"
+
+      queue_in = queue_out[/.out/]=".in"
 
       queue = queue_out[/bridge.\d+/]
       queue_in = queue + ".in"

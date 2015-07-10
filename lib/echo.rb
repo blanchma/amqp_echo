@@ -18,7 +18,7 @@ class Echo < Subscriber
       queue_out = delivery_info.routing_key
       puts "[Echo]  Message coming from #{queue_out}"
 
-      queue_in = queue_out[/.out/]=".in"
+      queue_in = queue_out.sub(/.out/, ".in")
 
       puts "[Echo]  Message echo to #{queue_in}"
 
