@@ -1,32 +1,40 @@
 class Registration
-  attr_reader :id, :attributes
+  attr_reader :id, :password, :topic, :queue
 
   def self.create
     registration = new
-    puts "Store registration[#{registration.id}]: #{registration.attributes}"
-    $redis.set registration.id, registration.attributes.to_json
-    Binder.new(Configuration.topics[:echo], registration.id).execute
-    Binder.new(Configuration.topics[:encrypted_echo], registration.id).execute
+
+    Binder.new(topic, registration.queue).execute
+    GrantPermission.new(registration.id,
+                        registration.password,
+                        registration.topic,
+                        registration.queue ).execute
+
+    puts "Store registration[#{registration.id}]: #{registration.to_json}"
+    $redis.set registration.id, registration.to_json
+
     registration
   end
 
   def initialize(mac_address=nil)
-    @attributes = { url: Configuration.amqp_url,
-                    topic: Configuration.topics[:echo],
-                    encrypted_topic: Configuration.topics[:encrypted_echo],
-                    queue: self.id,
-                    secret_key: self.secret_key}
+    @id = "bridge.#{Time.now.to_i}"
+    @queue = @id
+    @password = SecureRandom.urlsafe_base64(12, false)
+    @secret_key = SecureRandom.hex(64)
+    @topic = Configuration.topics[:echo]
   end
 
-  def id
-    @queue ||= "bridge.#{Time.now.to_i}"
-  end
-
-  def secret_key
-    SecureRandom.hex(64)
+  def amqp_url
+    "amqp://#{@id}:#{@password}:#{ENV['AMQP_HOST']}:#{ENV['AMQP_PORT']}/#{ENV['AMQP_VHOST']}"
   end
 
   def to_json
-    {registration: @attributes}.to_json
+    {registration: {
+      topic: @topic
+      queue: @queue,
+      secret_key: @secret_key,
+      amqp_url: amqp_url}
+    }.to_json
   end
+
 end
