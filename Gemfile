@@ -9,6 +9,7 @@ gem 'json'
 gem 'puma'
 gem 'rack'
 gem 'redis'
+gem 'typhoeus'
 
 group :development do
   gem 'httparty'
