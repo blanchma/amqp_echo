@@ -4,14 +4,16 @@ class Registration
   def self.create
     registration = new
 
-    Binder.new(topic, registration.queue).execute
-    GrantPermission.new(registration.id,
-                        registration.password,
-                        registration.topic,
-                        registration.queue ).execute
+    Binder.new(registration.topic, registration.queue).execute
+    if ENV['RACK_ENV'] == "development"
+      GrantPermission.new(registration.id,
+                          registration.password,
+                          registration.topic,
+                          registration.queue ).execute
+    end
 
     puts "Store registration[#{registration.id}]: #{registration.to_json}"
-    $redis.set registration.id, registration.to_json
+    $redis.set registration.id, registration.attributes.to_json
 
     registration
   end
@@ -25,16 +27,18 @@ class Registration
   end
 
   def amqp_url
-    "amqp://#{@id}:#{@password}:#{ENV['AMQP_HOST']}:#{ENV['AMQP_PORT']}/#{ENV['AMQP_VHOST']}"
+    "amqp://#{@id}:#{@password}:#{ENV['AMQP_HOST']}/#{ENV['AMQP_VHOST']}"
+  end
+
+  def attributes
+    {topic: @topic,
+     queue: @queue,
+     secret_key: @secret_key,
+     amqp_url: amqp_url }
   end
 
   def to_json
-    {registration: {
-      topic: @topic
-      queue: @queue,
-      secret_key: @secret_key,
-      amqp_url: amqp_url}
-    }.to_json
+    {registration: attributes}.to_json
   end
 
 end

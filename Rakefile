@@ -44,11 +44,11 @@ task :encrypted_ping do
   body = JSON.parse(response.body)
 
   amqp_url    = body["registration"]["url"]
-  topic       = body["registration"]["encrypted_topic"]
+  topic       = body["registration"]["topic"]
   queue       = body["registration"]["queue"]
   secret_key  = body["registration"]["secret_key"]
 
-  channel = AmqpConnection.create_channel
+  channel = Bunny.new(amqp_url).start.create_channel
   exchange = channel.topic(topic, durable: true)
 
   signature = Digest::SHA256.hexdigest("---ping---#{secret_key}---")

@@ -5,7 +5,7 @@ require 'digest'
 require 'fast_secure_compare/fast_secure_compare'
 
 class EncryptedEcho < Subscriber
-  self.topic = Configuration.topics[:encrypted_echo]
+  self.topic = Configuration.topics[:echo]
   self.queue_name = "bridge.out"
 
   def initialize
