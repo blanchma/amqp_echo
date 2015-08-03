@@ -12,23 +12,34 @@ GEM
     dotenv (2.0.2)
     ethon (0.7.4)
       ffi (>= 1.3.0)
+    execjs (2.5.2)
     fast_secure_compare (1.0.1)
     ffi (1.9.10)
+    hike (1.2.3)
     httparty (0.13.5)
       json (~> 1.8)
       multi_xml (>= 0.5.2)
     json (1.8.3)
+    multi_json (1.11.2)
     multi_xml (0.5.5)
-    puma (2.11.3)
-      rack (>= 1.1, < 2.0)
+    puma (2.12.0)
     rack (1.6.4)
     rack-test (0.6.3)
       rack (>= 1.0)
     redis (3.2.1)
     shotgun (0.9.1)
       rack (>= 1.0)
+    sprockets (2.12.4)
+      hike (~> 1.2)
+      multi_json (~> 1.0)
+      rack (~> 1.0)
+      tilt (~> 1.1, != 1.3.0)
+    tilt (1.4.1)
     typhoeus (0.7.2)
       ethon (>= 0.7.4)
+    uglifier (2.5.3)
+      execjs (>= 0.3.0)
+      json (>= 1.8.0)
 
 PLATFORMS
   ruby
@@ -46,7 +57,10 @@ DEPENDENCIES
   rack-test
   redis
   shotgun
+  sprockets (~> 2.0)
+  tilt
   typhoeus
+  uglifier
 
 BUNDLED WITH
    1.10.5
