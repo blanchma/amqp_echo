@@ -10,7 +10,8 @@ require_relative 'config/configuration'
 
 map '/assets' do
   environment = Sprockets::Environment.new( File.expand_path(File.dirname(__FILE__)) )
-  puts environment.js_compressor = :uglifier
+  environment.js_compressor = :uglifier
+  environment.append_path Bower.environment.directory
   environment.append_path 'assets/javascripts'
   environment.append_path 'assets/stylesheets'
   run environment

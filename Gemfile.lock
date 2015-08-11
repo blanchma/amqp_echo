@@ -2,6 +2,8 @@ GEM
   remote: https://rubygems.org/
   specs:
     amq-protocol (1.9.2)
+    bower (0.0.5)
+      multi_json
     bunny (1.7.0)
       amq-protocol (>= 1.9.2)
     clap (1.0.0)
@@ -45,6 +47,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  bower
   bunny
   cuba
   cutest

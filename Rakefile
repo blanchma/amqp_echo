@@ -79,30 +79,6 @@ task :encrypted_ping do
   end
 end
 
-#TODO: pending to complete
-namespace :js do
-  environment = Sprockets::Environment.new( File.expand_path(File.dirname(__FILE__)) )
-  environment.js_compressor = :uglifier
-  environment.append_path 'assets/javascripts'
-  environment.append_path 'assets/stylesheets'
-  source_code = environment['app.coffee']
-
-  desc 'compile CoffeeScript with Sprockets'
-  task :compile do
-    bundle_file = './build/js/app.bundle.js'
-    File.open(bundle_file, 'w'){ |f| f.write(source_code) }
-    puts "app.coffee -> #{bundle_file}"
-  end
-
-  desc 'compile and minify CoffeeScript with Sprockets'
-  task :min do
-    bundle_min = './dist/js/app.bundle.min.js'
-    source_min = Uglifier.compile(source_code)
-    File.open(bundle_min, 'w'){ |f| f.write(source_min) }
-    puts "app.coffee -> #{bundle_min}"
-  end
-end
-
 task :test do
   exec "cutest test/*.rb"
 end
