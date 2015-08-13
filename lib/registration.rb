@@ -13,7 +13,7 @@ class Registration
     end
 
     puts "Store registration[#{registration.id}]: #{registration.to_json}"
-    $redis.set registration.id, registration.attributes.to_json
+    registration.save
 
     registration
   end
@@ -35,6 +35,12 @@ class Registration
      queue: @queue,
      secret_key: @secret_key,
      amqp_url: amqp_url }
+  end
+
+  def save
+    Rab.create(queue: @queue,
+               secret_key: @secret_key,
+               amqp_url: amqp_url)
   end
 
   def to_json
