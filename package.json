@@ -1,0 +1,21 @@
+{
+  "name": "bridge-cloud",
+  "description": "A bridge between the API and the RAB",
+  "version": "0.0.2",
+  "devDependencies": {
+    "babel-core": "latest",
+    "babel-loader": "latest",
+    "webpack": "~1.4.13",
+    "expose-loader": "~0.6.0",
+    "imports-loader": "~0.6.3",
+    "exports-loader": "~0.6.2",
+    "lodash": "~2.4.1",
+    "chunk-manifest-webpack-plugin": "~0.0.1"
+  },
+  "dependencies": {
+    "react": "0.13.3",
+    "react-tools": "latest",
+    "react-bootstrap": "latest",
+    "react-router-bootstrap": "latest"
+  }
+}

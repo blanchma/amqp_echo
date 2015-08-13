@@ -2,6 +2,7 @@ require "cuba/render"
 require "erb"
 
 Cuba.plugin Cuba::Render
+Cuba.settings[:render][:views] = "./app/views/"
 
 class Admin < Cuba; end;
 
