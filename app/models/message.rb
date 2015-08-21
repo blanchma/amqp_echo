@@ -9,4 +9,8 @@ class Message < Ohm::Model
   reference :response, :Message
 
   index :device_avid
+
+  def to_json(options={})
+    self.attributes.merge(id: self.id).to_json
+  end
 end

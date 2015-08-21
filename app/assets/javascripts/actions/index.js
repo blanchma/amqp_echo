@@ -39,6 +39,38 @@ export const MESSAGES_REQUEST = 'MESSAGES_REQUEST';
 export const MESSAGES_SUCCESS = 'MESSAGES_SUCCESS';
 export const MESSAGES_FAILURE = 'MESSAGES_FAILURE';
 
+function fetchMessages(rabId, nextPageUrl) {
+  console.log("fetchMessages");
+
+  return {
+    rabId,
+    [CALL_API]: {
+      types: [MESSAGES_REQUEST, MESSAGES_SUCCESS, MESSAGES_FAILURE],
+      endpoint: nextPageUrl,
+      schema: Schemas.MESSAGE_ARRAY
+    }
+  };
+}
+/**
+ * Fetches a page of starred repos by a particular user.
+ * Bails out if page is cached and user didn’t specifically request next page.
+ * Relies on Redux Thunk middleware.
+ */
+export function loadMessages(rabId, nextPage) {
+  return (dispatch, getState) => {
+    const {
+      nextPageUrl = `registrations/${rabId}/messages`,
+      pageCount = 0
+    } = getState().pagination.messagesByRab[rabId] || [];
+
+    if (pageCount > 0 && !nextPage) {
+      return null;
+    }
+
+    return dispatch(fetchMessages(rabId, nextPageUrl));
+  };
+}
+
 export const RESET_ERROR_MESSAGE = 'RESET_ERROR_MESSAGE';
 /**
  * Resets the currently visible error message.

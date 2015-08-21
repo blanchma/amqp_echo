@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { loadRegistrations } from './../actions';
 
-import { Row, Col, Table} from 'react-bootstrap';
+import { Row, Col, Table, Button} from 'react-bootstrap';
 import _ from 'lodash';
 
 export default class RegistrationPage extends Component {
@@ -15,6 +15,9 @@ export default class RegistrationPage extends Component {
     this.props.loadRegistrations() ;
   }
 
+  componentWillReceiveProps(nextProps) {
+  }
+
   render() {
     return(
        <Row className='show-grid'>
@@ -22,16 +25,27 @@ export default class RegistrationPage extends Component {
          <Table>
           <thead>
              <tr>
-               <th>#</th>
-               <th>First Name</th>
-               <th>Last Name</th>
-               <th>Username</th>
+               <th>Queue</th>
+               <th>Mac Address</th>
+               <th>User ID</th>
+               <th>Location ID</th>
+               <th>Messages</th>
              </tr>
            </thead>
            <tbody>
            {
-             _.collect(this.props.registrations, function(registration) {
-               return <tr><td>{registration.queue}</td></tr>;
+             _.collect(this.props.registrations, registration => {
+              return (<tr key={registration.id}>
+                <td>{registration.queue}</td>
+                <td>{registration.macAddress}</td>
+                <td>{registration.userId}</td>
+                <td>{registration.locationId}</td>
+                <td>
+                  <Button bsStyle='primary' onClick={e => this.props.onShowMessages(registration.id)}>
+                  Messages
+                  </Button>
+                </td>
+              </tr>);
              })
            }
            </tbody>
@@ -43,7 +57,7 @@ export default class RegistrationPage extends Component {
 }
 
 function mapStateToProps(state) {
-  return { registrations: state.registrations };
+  return {registrations: state.entities.registrations };
 }
 
 export default connect(

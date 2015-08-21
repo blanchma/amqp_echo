@@ -6,14 +6,14 @@ class Rab < Ohm::Model
 
   #Rab's data
   attribute :mac_address
-  attribute :user
-  attribute :location
+  attribute :user_id
+  attribute :location_id
   collection :devices, :Device
   collection :messages, :Message
 
   index :queue
 
   def to_json(options={})
-    self.attributes.to_json
+    self.attributes.merge(id: self.id).to_json
   end
 end

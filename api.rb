@@ -19,12 +19,17 @@ Api.define do
     end
 
     on get do
+      on "registrations/:rab_id/messages" do |rab_id|
+        res["Content-Type"]="application/json; charset=utf-8"
+        messages = Message.find(rab_id: rab_id).to_a
+        res.write messages.to_json
+      end
+
       on "registrations" do
-      res["Content-Type"]="application/json; charset=utf-8"
+        res["Content-Type"]="application/json; charset=utf-8"
         rabs = Rab.all.to_a
         res.write rabs.to_json
       end
-
     end
   end
 end

@@ -1,5 +1,5 @@
 import * as ActionTypes from '../actions';
-import merge from 'lodash';
+import _ from 'lodash';
 import paginate from './paginate';
 import { combineReducers } from 'redux';
 
@@ -8,7 +8,7 @@ import { combineReducers } from 'redux';
  */
 export function entities(state = { registrations: {}, messages: {} }, action) {
   if (action.response && action.response.entities) {
-    return merge({}, state, action.response.entities);
+    return _.merge({}, state, action.response.entities);
   }
 
   return state;
@@ -41,8 +41,8 @@ export const pagination = combineReducers({
       ActionTypes.REGISTRATIONS_FAILURE
     ]
   }),
-  messages: paginate({
-    mapActionToKey: action => action.queue,
+  messagesByRab: paginate({
+    mapActionToKey: action => action.rabId,
     types: [
       ActionTypes.MESSAGES_REQUEST,
       ActionTypes.MESSAGES_SUCCESS,
