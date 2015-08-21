@@ -3,6 +3,8 @@ import { Grid } from 'react-bootstrap';
 import Header from '../components/Header';
 import RegistrationPage from '../components/RegistrationPage';
 import MessageList from '../components/MessageList';
+import InboxForm from '../components/InboxForm';
+
 
 var App = React.createClass({
   getInitialState: function() {
@@ -16,6 +18,7 @@ var App = React.createClass({
       <Grid>
         <Header />
         <RegistrationPage onShowMessages={this.handleShowMessages}/>
+        <InboxForm rabId={this.state.rabId}/>
         <MessageList rabId={this.state.rabId}/>
       </Grid>
     );
