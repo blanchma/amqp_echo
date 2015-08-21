@@ -5,7 +5,7 @@ var config = module.exports = {
   context: path.join(__dirname, '../', '../'),
 };
 
-config.entry = './app/source/javascripts/entry.js';
+config.entry = './app/assets/javascripts/index.js';
 
 config.output = {
   // this is our app/assets/javascripts directory, which is part of the Sprockets pipeline

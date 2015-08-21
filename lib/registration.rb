@@ -1,7 +1,7 @@
 class Registration
   attr_reader :id, :password, :topic, :queue
 
-  def self.create
+  def self.create(params)
     registration = new
 
     Binder.new(registration.topic, registration.queue).execute
