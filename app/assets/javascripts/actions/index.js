@@ -71,6 +71,30 @@ export function loadMessages(rabId, nextPage) {
   };
 }
 
+export const SUBMIT_MESSAGE_REQUEST = 'SUBMIT_MESSAGE_REQUEST';
+export const SUBMIT_MESSAGE_SUCCESS = 'SUBMIT_MESSAGE_SUCCESS';
+export const SUBMIT_MESSAGE_FAILURE = 'SUBMIT_MESSAGE_FAILURE';
+
+export function submitMessage(rabId, bytes) {
+  return (dispatch, getState) => {
+
+  var data = new FormData();
+  data.append('bytes', JSON.stringify(bytes) );
+  
+  const action = {
+    rabId,
+    [CALL_API]: {
+      types: [SUBMIT_MESSAGE_REQUEST, SUBMIT_MESSAGE_SUCCESS, SUBMIT_MESSAGE_FAILURE],
+      options: {method: 'POST', body: data },
+      endpoint: `registrations/${rabId}/messages`,
+      schema: Schemas.MESSAGE
+    }
+  };
+
+    return dispatch(action);
+  };
+}
+
 export const RESET_ERROR_MESSAGE = 'RESET_ERROR_MESSAGE';
 /**
  * Resets the currently visible error message.

@@ -29,6 +29,28 @@ export function errorMessage(state = null, action) {
   return state;
 }
 
+function submitMessages(state = { }, action) {
+  switch (action.type) {
+  case ActionTypes.SUBMIT_MESSAGE_REQUEST:
+    return _.merge({}, state, {
+      submiting: true
+    });
+  case ActionTypes.SUBMIT_MESSAGE_SUCCESS:
+    return _.merge({}, state, {
+      submiting: false
+    });
+  case ActionTypes.SUBMIT_MESSAGE_FAILURE:
+    return _.merge({}, state, {
+      submiting: false
+    });
+    // return Object.assign({}, state, {
+    //   [action]: posts(state[action.reddit], action)
+    // });
+  default:
+    return state;
+  }
+}
+
 /**
  * Updates the pagination data for different actions.
  */
@@ -48,5 +70,6 @@ export const pagination = combineReducers({
       ActionTypes.MESSAGES_SUCCESS,
       ActionTypes.MESSAGES_FAILURE
     ]
-  })
+  }),
+  submitMessages: submitMessages
 });

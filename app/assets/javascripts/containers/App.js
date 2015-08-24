@@ -6,6 +6,8 @@ import MessageList from '../components/MessageList';
 import InboxForm from '../components/InboxForm';
 
 
+
+
 var App = React.createClass({
   getInitialState: function() {
     return {
@@ -18,7 +20,7 @@ var App = React.createClass({
       <Grid>
         <Header />
         <RegistrationPage onShowMessages={this.handleShowMessages}/>
-        <InboxForm rabId={this.state.rabId}/>
+        <InboxForm rabId={this.state.rabId} />
         <MessageList rabId={this.state.rabId}/>
       </Grid>
     );
@@ -27,7 +29,6 @@ var App = React.createClass({
   handleShowMessages: function(rabId) {
     this.setState({rabId: rabId})
   }
-
 });
 
 module.exports = App;

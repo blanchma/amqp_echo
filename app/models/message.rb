@@ -1,5 +1,5 @@
 class Message < Ohm::Model
-  attribute :body
+  attribute :raw
   attribute :message_id
   attribute :device_avid
   attribute :direction

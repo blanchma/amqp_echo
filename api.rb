@@ -11,6 +11,14 @@ class Api < Cuba; end;
 Api.define do
   on "api" do
     on post do
+      on "registrations/:rab_id/messages" do |rab_id|
+        res["Content-Type"]="application/json; charset=utf-8"
+        puts req.params["bytes"]
+        message = Message.create(rab_id: rab_id, raw: req.params["bytes"], direction: "sent")
+        res.status = 201
+        res.write(message.to_json)
+      end
+
       on "registrations" do
         res["Content-Type"]="application/json"
         registration = Registration.create(params)

@@ -4,9 +4,20 @@ Dotenv.load
 
 require './config/configuration'
 Dir[File.dirname(__FILE__) + '/lib/*.rb'].each{|file| require file }
+Dir[File.dirname(__FILE__) + '/app/models/*.rb'].each{|file| require file }
 
-redis_url = URI.parse(ENV["REDISCLOUD_URL"])
-$redis = Redis.new(url: redis_url)
+$redis = Redic.new(ENV["REDISCLOUD_URL"])
+
+task :seed do
+  5.times {|i| Rab.create queue: "tute#{i}", mac_address: "127.0.0.#{i}", user_id: i, location_id: i }
+  Rab.all.to_a.each {|r|
+    10.times {|i| Message.create( rab_id: r.id,
+                                  message_id: "id_#{i}",
+                                  body: "body #{i}",
+                                  direction: [:sent, :received].sample) }
+  }
+
+end
 
 task :listen do
   #Echo.new.start

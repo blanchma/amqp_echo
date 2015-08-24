@@ -45,7 +45,7 @@ export default class MessageList extends Component {
              {
                _.collect(this.props.messages, message => {
                 return (
-                  <tr>
+                  <tr key={message.messageId}>
                     <td>{message.messageId}</td>
                     <td>{message.body}</td>
                     <td>{message.deviceAvid}</td>
