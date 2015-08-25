@@ -16,9 +16,9 @@ class Binder
     queue.bind(@topic, routing_key: "#{@queue_name}.in")
 
     #Bind Queue for outputs
-    queue = @channel.queue("bridge.out", durable: true)
+    queue = @channel.queue(Configuration.queues[:bridge_in], durable: true)
     queue.bind(@topic, routing_key: "#{@queue_name}.out")
-    
+
     @channel.close
   end
 

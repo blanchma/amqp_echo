@@ -1,8 +1,10 @@
 class Rab < Ohm::Model
   #Bridge's data
   attribute :queue
+  attribute :debug
   attribute :secret_key
   attribute :amqp_url
+  attribute :created_at
 
   #Rab's data
   attribute :mac_address

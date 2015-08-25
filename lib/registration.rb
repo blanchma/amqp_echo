@@ -23,7 +23,7 @@ class Registration
     @queue = @id
     @password = SecureRandom.urlsafe_base64(12, false)
     @secret_key = SecureRandom.hex(64)
-    @topic = Configuration.topics[:echo]
+    @topic = Configuration.topics[:bridge_v1]
   end
 
   def amqp_url
@@ -40,7 +40,8 @@ class Registration
   def save
     Rab.create(queue: @queue,
                secret_key: @secret_key,
-               amqp_url: amqp_url)
+               amqp_url: amqp_url,
+               created_at: Time.now.utc)
   end
 
   def to_json
