@@ -1,9 +1,9 @@
-require 'configuration'
+
 
 module Receiver
-  class FromRab
+  class FromRab < ::Subscriber
 
-    self.topic = Configuration.topic[:bridge_v1]
+    self.topic = Configuration.topics[:bridge_v1]
     self.queue_name =  Configuration.queues[:bridge_in]
 
     def initialize
@@ -20,3 +20,5 @@ module Receiver
         #Sender::ToRab.send(body)
       end
     end
+  end
+end

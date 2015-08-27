@@ -1,3 +1,4 @@
+
 module Sender
   class ToApi
     include Singleton

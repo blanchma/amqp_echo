@@ -1,9 +1,8 @@
-require 'configuration'
 
 module Receiver
-  class FromRab
+  class FromRab < Subscriber
 
-    self.topic = Configuration.topic[:bridge_v1]
+    self.topic = Configuration.topics[:bridge_v1]
     self.queue_name =  Configuration.queues[:bridge_in]
 
     def initialize
@@ -13,15 +12,15 @@ module Receiver
     def start
       puts "[Receiver::FromRab] Start to listen to #{@queue_name} on topic: #{@topic}"
 
-      @queue.subscribe(auto_delete: true) do |delivery_info, properties, body|
+      @queue.subscribe(block: true, auto_delete: true) do |delivery_info, properties, body|
         puts "[Receiver::FromRab] Message: #{body}"
-        queue = delivery_info.routing_key
-        puts "[Receiver::FromRab]  Message coming from #{queue_out}"
+        routing_key = delivery_info.routing_key
+        queue = routing_key[/avi-on.rab.\d+/]
+        # queue_in = queue + ".in"
 
-        //queue = queue_out[/bridge.\d+/]
-        //queue_in = queue + ".in"
+        puts "[Receiver::FromRab]  Message coming from #{queue}"
 
-        rab = Rab.find(queue: queue)
+        rab = Rab.find(queue: queue).first
 
         if rab
           secret_key = rab.secret_key
@@ -35,16 +34,7 @@ module Receiver
           puts "[Receiver::FromRab] Received signature: #{received_signature}"
 
           if FastSecureCompare.compare(signature, received_signature)
-            puts "[Receiver::FromRab] Encrypted message echo to #{queue_in}"
-
-            Message.create(rab_id: rab.id, message: body, direction: :received, created_at: Time.now.utc)
-            # exchange.publish( body,
-            #                   { routing_key: queue_in,
-            #                     headers: {
-            #                       "avi-on-sign" => signature,
-            #                       "code" => "200"
-            #                     },
-            #                     persistent: true})
+            Message.create(rab_id: rab.id, body: body, direction: :received, created_at: Time.now.utc)
 
             #Sender::ToApi.send(body)
           else
@@ -69,3 +59,5 @@ module Receiver
         end
       end
     end
+  end
+end

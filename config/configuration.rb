@@ -1,9 +1,6 @@
 module Configuration
 
   class << self
-    def configuration
-    end
-
     def topics
       {
         echo: "avi-on.bridge.echo",
