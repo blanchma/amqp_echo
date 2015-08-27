@@ -1,2 +1,5 @@
 .env
 dump.rdb
+node_modules/*
+bower_components/*
+*.hot-update.js*
