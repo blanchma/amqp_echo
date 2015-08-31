@@ -19,28 +19,30 @@ class Registration
   end
 
   def initialize(mac_address=nil)
-    @id = "bridge.#{Time.now.to_i}"
+    @id = "avi-on.rab.#{Time.now.to_i}"
     @queue = @id
     @password = SecureRandom.urlsafe_base64(12, false)
     @secret_key = SecureRandom.hex(64)
-    @topic = Configuration.topics[:echo]
+    @topic = Configuration.topics[:bridge_v1]
   end
 
   def amqp_url
-    "amqp://#{@id}:#{@password}:#{ENV['AMQP_HOST']}/#{ENV['AMQP_VHOST']}"
+    #{}"amqp://#{@id}:#{@password}:#{ENV['AMQP_HOST']}/#{ENV['AMQP_VHOST']}"
+    Configuration.amqp_url
   end
 
   def attributes
     {topic: @topic,
      queue: @queue,
      secret_key: @secret_key,
-     amqp_url: amqp_url }
+     url: amqp_url }
   end
 
   def save
     Rab.create(queue: @queue,
                secret_key: @secret_key,
-               amqp_url: amqp_url)
+               amqp_url: amqp_url,
+               created_at: Time.now.utc)
   end
 
   def to_json

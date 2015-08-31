@@ -3,7 +3,7 @@ Bundler.require(:default, :development)
 Dotenv.load
 
 require './config/configuration'
-Dir[File.dirname(__FILE__) + '/lib/*.rb'].each{|file| require file }
+Dir[File.dirname(__FILE__) + '/lib/**/*.rb'].each{|file| require file }
 Dir[File.dirname(__FILE__) + '/app/models/*.rb'].each{|file| require file }
 
 $redis = Redic.new(ENV["REDISCLOUD_URL"])
@@ -19,14 +19,56 @@ task :seed do
 
 end
 
-task :listen do
+task :listen_from_rab do
   #Echo.new.start
-  EncryptedEcho.new.start
+  Receiver::FromRab.new.start
   sleep
 end
 
+task :inverted_ping do
+  response = HTTParty.post "#{ENV["HOST"]}/api/registrations", body: {user_id: 1, location: 1}
+  puts "Response: #{response.body}"
+  body = JSON.parse(response.body)
+
+  amqp_url    = body["registration"]["url"]
+  topic       = body["registration"]["topic"]
+  queue       = body["registration"]["queue"]
+  secret_key  = body["registration"]["secret_key"]
+
+  channel = Bunny.new(amqp_url).start.create_channel
+  exchange = channel.topic(topic, durable: true)
+
+  listen_echo = Subscriber.new(topic, queue)
+
+  listen_echo.start(block: true) do |delivery_info, properties, body|
+    puts "[InvertedPing] Message: #{body}"
+
+    routing_key = delivery_info.routing_key
+    puts "[InvertedPing] Message coming from #{routing_key}"
+
+    signature = Digest::SHA256.hexdigest("---#{body}---#{secret_key}---")
+
+    puts "[InvertedPing] Headers: #{properties.headers}"
+
+    if FastSecureCompare.compare(properties.headers["avi-on-sign"], signature)
+      puts "[InvertedPing] SUCCESS: Signature and message match"
+
+        signature = Digest::SHA256.hexdigest("---#{body}---#{secret_key}---")
+        exchange.publish(body,  headers: {"avi-on-sign" =>  signature},
+                                  routing_key: "#{queue}.out",
+                                  persistent: true)
+    else
+      puts "[InvertedPing] ERROR: Signature and message NOT match"
+    end
+  end
+
+  at_exit do
+    channel.close
+  end
+end
+
 task :ping do
-  response = HTTParty.post "#{ENV["HOST"]}/registration"
+  response = HTTParty.post "#{ENV["HOST"]}/api/registrations"
   puts "Response: #{response.body}"
   body = JSON.parse(response.body)
 
@@ -50,7 +92,7 @@ task :ping do
 end
 
 task :encrypted_ping do
-  response = HTTParty.post "#{ENV["HOST"]}/registration"
+  response = HTTParty.post "#{ENV["HOST"]}/api/registrations"
   puts "Response: #{response.body}"
   body = JSON.parse(response.body)
 

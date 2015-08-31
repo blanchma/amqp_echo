@@ -1,5 +1,5 @@
 module Transpiler
-  class 1_0
+  class V1
     # Examples
     # 00 0a 00 00 00 80 // write dimming a 1 device sin ACK valor 80 (127)
     # 00 0a 50 00 01 FF // write dimming al grupo 5000 con ACK id msg 01 prendido 100% (FF)

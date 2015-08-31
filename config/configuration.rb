@@ -1,15 +1,20 @@
 module Configuration
 
   class << self
-    def configuration
-    end
-
     def topics
       {
         echo: "avi-on.bridge.echo",
         encrypted_echo: "avi-on.bridge.encrypt",
-        inter: "avi-on.bridge.inter"
+        bridge_v1: "avi-on.bridge.v1",
+        api_v1: "avi-on.api.v1"
       }
+    end
+
+    def queues
+      { bridge_in: "avi-on.bridge.in",
+        api_out: "avi-on.api.out",
+        api_in: "avi-on.api.in"
+       }
     end
 
     def amqp_url

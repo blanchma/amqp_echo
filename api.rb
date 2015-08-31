@@ -1,7 +1,7 @@
 require "cuba/safe"
 
 require_relative 'config/configuration'
-Dir[File.dirname(__FILE__) + '/lib/*.rb'].each{|file| require file }
+Dir[File.dirname(__FILE__) + '/lib/**/*.rb'].each{|file| require file }
 Dir[File.dirname(__FILE__) + '/app/models/*.rb'].each{|file| require file }
 
 Cuba.plugin RedisConnect
@@ -14,14 +14,16 @@ Api.define do
       on "registrations/:rab_id/messages" do |rab_id|
         res["Content-Type"]="application/json; charset=utf-8"
         puts req.params["bytes"]
-        message = Message.create(rab_id: rab_id, raw: req.params["bytes"], direction: "sent")
+        message = Message.new(rab_id: rab_id, body: req.params["bytes"], direction: "sent")
+        message.save
+        Sender::ToRab.send(message)
         res.status = 201
         res.write(message.to_json)
       end
 
       on "registrations" do
         res["Content-Type"]="application/json"
-        registration = Registration.create(params)
+        registration = Registration.create(req.params)
         res.write registration.to_json
       end
     end

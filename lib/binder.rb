@@ -11,15 +11,21 @@ class Binder
   end
 
   def execute
+    puts "[Binder] Topic: #{@topic}"
+    puts "[Binder] Queue: #{@queue_name}"
+
+    #Create exchange to handle routings to RABs
+    exchange = @channel.topic(Configuration.topics[:bridge_v1], durable: true)
+
     #Bind Queue for inputs
     queue = @channel.queue(@queue_name, durable: true)
-    queue.bind(@topic, routing_key: "#{@queue_name}.in")
+    puts queue.bind(exchange, routing_key: "#{@queue_name}.in")
 
     #Bind Queue for outputs
-    queue = @channel.queue("bridge.out", durable: true)
-    queue.bind(@topic, routing_key: "#{@queue_name}.out")
-    
-    @channel.close
+    queue = @channel.queue(Configuration.queues[:bridge_in], durable: true)
+    puts queue.bind(exchange, routing_key: "#{@queue_name}.out")
+
+    #@channel.close
   end
 
 
