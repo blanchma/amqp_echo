@@ -14,6 +14,7 @@ class Rab < Ohm::Model
   collection :messages, :Message
 
   index :queue
+  index :user_id
 
   def to_json(options={})
     self.attributes.merge(id: self.id).to_json

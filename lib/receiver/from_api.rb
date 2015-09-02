@@ -1,5 +1,3 @@
-
-
 module Receiver
   class FromRab < ::Subscriber
 
@@ -15,6 +13,8 @@ module Receiver
 
       @queue.subscribe(auto_delete: true) do |delivery_info, properties, body|
         puts "[Receiver::FromApi] Message: #{body}"
+
+        command = Transpiler::Change.parse(body)
 
         #Message.create(message: body, direction: :received, created_at: Time.now.utc)
         #Sender::ToRab.send(body)

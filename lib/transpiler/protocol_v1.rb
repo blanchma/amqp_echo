@@ -1,10 +1,14 @@
 module Transpiler
-  class V1
+  module ProtocolV1
     # Examples
     # 00 0a 00 00 00 80 // write dimming a 1 device sin ACK valor 80 (127)
     # 00 0a 50 00 01 FF // write dimming al grupo 5000 con ACK id msg 01 prendido 100% (FF)
     # 01 0a 00 00 02         // read dimming de 1 device message id 02
     # 01 0a 02 80        // response valor dimming 80 message id 02
+
+    def self.parse(bytes)
+      return Command.new
+    end
 
     #VERBS
     AP_VERB_WRITE = 0
@@ -20,7 +24,7 @@ module Transpiler
     AP_VERB_TEACH = 10
     AP_VERB_NONE = 255
 
-    def verbs
+    def self.verbs
       {write: AP_VERB_WRITE,
        read: AP_VERB_READ,
        insert: AP_VERB_INSERT,
@@ -64,7 +68,7 @@ module Transpiler
     AP_NOUN_FADE_TIME = 25
     AP_NOUN_NONE = 255
 
-    def nouns
+    def self.nouns
       {groups_table: AP_NOUN_GROUPS_TABLE,
       date_time: AP_NOUN_DATE_TIME,
       sun_rise_set_table: AP_NOUN_SUN_RISE_SET_TABLE,
@@ -87,7 +91,7 @@ module Transpiler
     APP_VENDOR_ID_BRIDGELUX = 006
     APP_VENDOR_ID_GREEN_POWER_SOLUTIONS = 007
 
-    def vendors
+    def self.vendors
       {avion: APP_VENDOR_ID_AVION,
       jasco: APP_VENDOR_ID_JASCO,
       ge: APP_VENDOR_ID_GE,
